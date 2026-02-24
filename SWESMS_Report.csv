@@ -1,0 +1,4 @@
+EquipmentID,Name,Day,UsageHours,Temperature,Energy(kWh),Cost(RM),SafetyStatus
+S07,POwerPOwer,1,30,67,2.4,1.2,NEAR-OVERHEAT
+S07,POwerPOwer,2,50,70,4,2,NEAR-OVERHEAT
+S06,TEST TEST,1,40,60,8,4,NEAR-OVERHEAT
