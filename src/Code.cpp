@@ -11,6 +11,7 @@
 #include <string>
 #include <fstream>
 #include <algorithm>
+#include <cctype>
 using namespace std;
 
 const double tariffRate = 0.50; // RM per kWh
@@ -35,7 +36,15 @@ struct Equipment {
     vector<DailyRecord> records;
 };
 
-int findEquipmentIndex(const vector<Equipment> &list, const string &id) {
+string toUpperCase(string str) {
+    for(char &c : str) {
+        c = toupper(c);
+    }
+    return str;
+}
+
+int findEquipmentIndex(const vector<Equipment> &list, string id) {
+    id = toUpperCase(id);
     for(int i = 0; i < list.size(); i++) {
         if(list[i].id == id)
             return i;
@@ -43,13 +52,14 @@ int findEquipmentIndex(const vector<Equipment> &list, const string &id) {
     return -1;
 }
 
-void addEquipment(vector<Equipment> &list) { // add equipment
+void addEquipment(vector<Equipment> &list) { //add equipment
     Equipment eq;
     bool validID = false;
 
     while(!validID) {
         cout << "Enter Equipment ID: ";
         cin >> eq.id;
+        eq.id = toUpperCase(eq.id);
 
         if(findEquipmentIndex(list, eq.id) != -1)
             cout << "Error: ID already exists. Try again.\n";
@@ -110,7 +120,7 @@ void viewEquipment(const vector<Equipment> &list) { // To view all equipment
     }
 }
 
-void updateEquipment(vector<Equipment> &list) { // UPDATE THE EQUIPMENT
+void updateEquipment(vector<Equipment> &list) { //update equipment
     string id;
     cout << "Enter Equipment ID to update: ";
     cin >> id;
@@ -120,6 +130,26 @@ void updateEquipment(vector<Equipment> &list) { // UPDATE THE EQUIPMENT
         cout << "Equipment not found.\n";
         return;
     }
+
+    string newID;
+    bool validID = false;
+
+    while(!validID) {
+        cout << "Enter new Equipment ID: ";
+        cin >> newID;
+        newID = toUpperCase(newID);
+
+        int checkIndex = findEquipmentIndex(list, newID);
+
+        // Allow same ID (if user doesn't change it)
+        if(checkIndex != -1 && checkIndex != index) {
+            cout << "Error: ID already exists. Try again.\n";
+        } else {
+            validID = true;
+        }
+    }
+
+    list[index].id = newID;
 
     cout << "Enter new power rating: ";
     cin >> list[index].powerRating;
