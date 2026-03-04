@@ -7,11 +7,12 @@
 //============================================================================
 
 #include <iostream>
-#include <vector>
-#include <string>
-#include <fstream>
-#include <algorithm>
-#include <cctype>
+
+#include <vector>//store data
+#include <string>//text (strings)
+#include <fstream>//file handling (reading and writing files)
+#include <algorithm>//built in algorithms like sorting or searching
+#include <cctype>//character checking and conversion
 using namespace std;
 
 const double tariffRate = 0.50; // RM per kWh
@@ -36,7 +37,7 @@ struct Equipment {
     vector<DailyRecord> records;
 };
 
-string toUpperCase(string str) {
+string toUpperCase(string str) { //make small letter upper case
     for(char &c : str) {
         c = toupper(c);
     }
@@ -53,32 +54,66 @@ int findEquipmentIndex(const vector<Equipment> &list, string id) {
 }
 
 void addEquipment(vector<Equipment> &list) { //add equipment
-    Equipment eq;
-    bool validID = false;
 
-    while(!validID) {
-        cout << "Enter Equipment ID: ";
-        cin >> eq.id;
-        eq.id = toUpperCase(eq.id);
+    int num;
+    cout << "How many equipment to add?:  ";
+    cin >> num;
 
-        if(findEquipmentIndex(list, eq.id) != -1)
-            cout << "Error: ID already exists. Try again.\n";
-        else
-            validID = true;
+    for(int i = 0; i < num; i++) {
+
+        cout << "\nEntering Equipment " << i+1 << endl;
+
+        Equipment eq;
+        bool validID = false;
+
+        while(!validID) {
+            cout << "Enter Equipment ID: ";
+            cin >> eq.id;
+            eq.id = toUpperCase(eq.id);
+
+            if(findEquipmentIndex(list, eq.id) != -1)
+                cout << "Error: ID already exists. Try again.\n";
+            else
+                validID = true;
+        }
+
+        cin.ignore();
+
+        cout << "Enter Equipment Name: ";
+        getline(cin, eq.name);
+
+        while(true) { //make sure user enter number instead of letters
+            cout << "Enter Power Rating (W): ";
+            cin >> eq.powerRating;
+
+            if(cin.fail()) {
+                cout << "Invalid input! Please enter a number.\n";
+                cin.clear();
+                cin.ignore(1000, '\n');
+            }
+            else {
+                break;
+            }
+        }
+
+        while(true) {
+            cout << "Enter Maintenance Limit (Hours): ";
+            cin >> eq.maintenanceLimit;
+
+            if(cin.fail()) {
+                cout << "Invalid input! Please enter a number.\n";
+                cin.clear();
+                cin.ignore(1000, '\n');
+            }
+            else {
+                break;
+            }
+        }
+
+        list.push_back(eq);
+
+        cout << "Equipment added successfully!\n";
     }
-
-    cin.ignore();
-    cout << "Enter Equipment Name: ";
-    getline(cin, eq.name);
-
-    cout << "Enter Power Rating (W): ";
-    cin >> eq.powerRating;
-
-    cout << "Enter Maintenance Limit (Hours): ";
-    cin >> eq.maintenanceLimit;
-
-    list.push_back(eq);
-    cout << "Equipment added successfully!\n";
 }
 
 void viewEquipment(const vector<Equipment> &list) { // To view all equipment
@@ -141,38 +176,72 @@ void updateEquipment(vector<Equipment> &list) { //update equipment
 
         int checkIndex = findEquipmentIndex(list, newID);
 
-        // Allow same ID (if user doesn't change it)
         if(checkIndex != -1 && checkIndex != index) {
             cout << "Error: ID already exists. Try again.\n";
-        } else {
+        }
+        else {
             validID = true;
         }
     }
 
     list[index].id = newID;
 
-    cout << "Enter new power rating: ";
-    cin >> list[index].powerRating;
+    // POWER RATING VALIDATION
+    while(true) {
+        cout << "Enter new power rating (W): ";
+        cin >> list[index].powerRating;
 
-    cout << "Enter new maintenance limit: ";
-    cin >> list[index].maintenanceLimit;
+        if(cin.fail()) {
+            cout << "Invalid input! Please enter a number.\n";
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
+        else {
+            break;
+        }
+    }
+
+    // MAINTENANCE LIMIT VALIDATION
+    while(true) {
+        cout << "Enter new maintenance limit (Hours): ";
+        cin >> list[index].maintenanceLimit;
+
+        if(cin.fail()) {
+            cout << "Invalid input! Please enter a number.\n";
+            cin.clear();
+            cin.ignore(1000, '\n');
+        }
+        else {
+            break;
+        }
+    }
 
     cout << "Equipment updated successfully.\n";
 }
 
 void deleteEquipment(vector<Equipment> &list) { // DELETE AN EQUIPMENT
-    string id;
-    cout << "Enter Equipment ID to delete: ";
-    cin >> id;
 
-    int index = findEquipmentIndex(list, id);
-    if(index == -1) {
-        cout << "Equipment not found.\n";
-        return;
+    int num;
+    cout << "How many equipment do you want to delete? ";
+    cin >> num;
+
+    for(int i = 0; i < num; i++) {
+
+        string id;
+
+        cout << "\nEnter Equipment ID to delete: ";
+        cin >> id;
+
+        int index = findEquipmentIndex(list, id);
+
+        if(index == -1) {
+            cout << "Equipment not found.\n";
+        }
+        else {
+            list.erase(list.begin() + index);
+            cout << "Equipment deleted successfully.\n";
+        }
     }
-
-    list.erase(list.begin() + index);
-    cout << "Equipment deleted successfully.\n";
 }
 
 void dailyUpdate(vector<Equipment> &list) { // DAILY USAGE OF THE EQUIPMENT
